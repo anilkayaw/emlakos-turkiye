@@ -1,0 +1,817 @@
+openapi: 3.0.3
+info:
+  title: EmlakOS Türkiye API
+  description: |
+    Türkiye'nin gayrimenkul piyasası için merkezi "işletim sistemi" API'si.
+    
+    Bu API, ev arama, kiralama, satın alma, satma ve yönetme süreçlerinin 
+    tamamını tek bir çatı altında toplayan platformun backend servislerini içerir.
+    
+    ## Servisler
+    - **API Gateway** (Port 8080) - Ana API giriş noktası
+    - **User Service** (Port 8081) - Kullanıcı yönetimi
+    - **Listing Service** (Port 8082) - İlan yönetimi ve arama
+    - **Valuation Service** (Port 8083) - AI destekli değerleme
+    - **Notification Service** (Port 8084) - Bildirim sistemi
+    
+    ## Kimlik Doğrulama
+    Tüm korumalı endpoint'ler JWT token gerektirir. Token'ı Authorization header'ında 
+    `Bearer <token>` formatında gönderin.
+    
+    ## Rate Limiting
+    API rate limiting uygulanmaktadır. Detaylar için response header'larını kontrol edin.
+    
+    ## Hata Kodları
+    - `400` - Bad Request (Geçersiz veri)
+    - `401` - Unauthorized (Kimlik doğrulama gerekli)
+    - `403` - Forbidden (Yetki yok)
+    - `404` - Not Found (Kaynak bulunamadı)
+    - `429` - Too Many Requests (Rate limit aşıldı)
+    - `500` - Internal Server Error (Sunucu hatası)
+  
+  version: 1.0.0
+  contact:
+    name: EmlakOS Türkiye Team
+    email: api@emlakos-turkiye.com
+    url: https://emlakos-turkiye.com
+  
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Geliştirme ortamı
+  - url: https://api.emlakos-turkiye.com
+    description: Production ortamı
+
+tags:
+  - name: Authentication
+    description: Kullanıcı kimlik doğrulama işlemleri
+  - name: Users
+    description: Kullanıcı yönetimi
+  - name: Listings
+    description: Gayrimenkul ilanları
+  - name: Valuation
+    description: AI destekli değerleme
+  - name: Contracts
+    description: Kira sözleşmeleri
+  - name: Notifications
+    description: Bildirim sistemi
+  - name: Search
+    description: Arama ve filtreleme
+
+paths:
+  # Health Check
+  /health:
+    get:
+      tags:
+        - System
+      summary: Sistem durumu
+      description: Tüm servislerin sağlık durumunu kontrol eder
+      responses:
+        '200':
+          description: Sistem çalışıyor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "OK"
+                  service:
+                    type: string
+                    example: "EmlakOS Türkiye API Gateway"
+                  version:
+                    type: string
+                    example: "1.0.0"
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  # Authentication
+  /api/users/register:
+    post:
+      tags:
+        - Authentication
+      summary: Kullanıcı kaydı
+      description: Yeni kullanıcı hesabı oluşturur
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_type
+                - name
+                - email
+                - password
+              properties:
+                user_type:
+                  type: string
+                  enum: [kiracı, mülk_sahibi, emlak_danışmanı]
+                  description: Kullanıcı tipi
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  description: Kullanıcı adı
+                email:
+                  type: string
+                  format: email
+                  description: E-posta adresi
+                password:
+                  type: string
+                  minLength: 6
+                  description: Şifre
+                phone_number:
+                  type: string
+                  description: Telefon numarası
+      responses:
+        '201':
+          description: Kullanıcı başarıyla oluşturuldu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Kullanıcı başarıyla kaydedildi"
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Geçersiz veri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/users/login:
+    post:
+      tags:
+        - Authentication
+      summary: Kullanıcı girişi
+      description: Kullanıcı kimlik doğrulaması yapar ve JWT token döner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: E-posta adresi
+                password:
+                  type: string
+                  description: Şifre
+      responses:
+        '200':
+          description: Giriş başarılı
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Giriş başarılı"
+                  token:
+                    type: string
+                    description: JWT access token
+                  user:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: Geçersiz kimlik bilgileri
+
+  # User Management
+  /api/users/me:
+    get:
+      tags:
+        - Users
+      summary: Kullanıcı profili
+      description: Giriş yapmış kullanıcının profil bilgilerini getirir
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Kullanıcı profili
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Kimlik doğrulama gerekli
+
+    put:
+      tags:
+        - Users
+      summary: Profil güncelleme
+      description: Kullanıcı profil bilgilerini günceller
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                phone_number:
+                  type: string
+                profile_picture_url:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: Profil başarıyla güncellendi
+        '400':
+          description: Geçersiz veri
+
+  # Listings
+  /api/listings:
+    get:
+      tags:
+        - Listings
+      summary: İlan arama
+      description: Filtreleme, sıralama ve sayfalama özellikleriyle ilanları listeler
+      parameters:
+        - name: city
+          in: query
+          description: Şehir
+          schema:
+            type: string
+        - name: district
+          in: query
+          description: İlçe
+          schema:
+            type: string
+        - name: property_type
+          in: query
+          description: Mülk tipi
+          schema:
+            type: string
+            enum: [daire, villa, dükkan, ofis, arsa]
+        - name: min_price
+          in: query
+          description: Minimum fiyat (TL)
+          schema:
+            type: number
+        - name: max_price
+          in: query
+          description: Maksimum fiyat (TL)
+          schema:
+            type: number
+        - name: room_count
+          in: query
+          description: Oda sayısı
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Sayfa numarası
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Sayfa başına kayıt sayısı
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: İlan listesi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  filters:
+                    type: object
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Listing'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags:
+        - Listings
+      summary: Yeni ilan oluşturma
+      description: Yeni bir gayrimenkul ilanı oluşturur
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListingRequest'
+      responses:
+        '201':
+          description: İlan başarıyla oluşturuldu
+        '400':
+          description: Geçersiz veri
+        '401':
+          description: Kimlik doğrulama gerekli
+
+  /api/listings/{id}:
+    get:
+      tags:
+        - Listings
+      summary: İlan detayı
+      description: Belirli bir ilanın detaylarını getirir
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: İlan ID'si
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: İlan detayları
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListingDetail'
+        '404':
+          description: İlan bulunamadı
+
+    put:
+      tags:
+        - Listings
+      summary: İlan güncelleme
+      description: Mevcut bir ilanı günceller
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: İlan ID'si
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateListingRequest'
+      responses:
+        '200':
+          description: İlan başarıyla güncellendi
+        '400':
+          description: Geçersiz veri
+        '401':
+          description: Kimlik doğrulama gerekli
+        '404':
+          description: İlan bulunamadı
+
+    delete:
+      tags:
+        - Listings
+      summary: İlan silme
+      description: Bir ilanı siler
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: İlan ID'si
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: İlan başarıyla silindi
+        '401':
+          description: Kimlik doğrulama gerekli
+        '404':
+          description: İlan bulunamadı
+
+  # Valuation
+  /api/valuation/estimate:
+    post:
+      tags:
+        - Valuation
+      summary: Mülk değerleme
+      description: AI destekli mülk değerleme tahmini yapar
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValuationRequest'
+      responses:
+        '200':
+          description: Değerleme tamamlandı
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValuationResponse'
+        '400':
+          description: Geçersiz veri
+
+  # Contracts
+  /api/contracts/rent:
+    post:
+      tags:
+        - Contracts
+      summary: Kira sözleşmesi oluşturma
+      description: Kiracı ve mülk sahibi arasında dijital kira sözleşmesi oluşturur
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRentContractRequest'
+      responses:
+        '201':
+          description: Sözleşme başarıyla oluşturuldu
+        '400':
+          description: Geçersiz veri
+        '401':
+          description: Kimlik doğrulama gerekli
+
+  # Search
+  /api/search/properties:
+    get:
+      tags:
+        - Search
+      summary: Gelişmiş mülk arama
+      description: Elasticsearch tabanlı gelişmiş arama
+      parameters:
+        - name: q
+          in: query
+          description: Arama sorgusu
+          schema:
+            type: string
+        - name: location
+          in: query
+          description: Konum (şehir, ilçe)
+          schema:
+            type: string
+        - name: price_range
+          in: query
+          description: Fiyat aralığı
+          schema:
+            type: string
+            example: "1000000-3000000"
+      responses:
+        '200':
+          description: Arama sonuçları
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  query:
+                    type: string
+                  total:
+                    type: integer
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Listing'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Kullanıcı ID'si
+        user_type:
+          type: string
+          enum: [kiracı, mülk_sahibi, emlak_danışmanı]
+          description: Kullanıcı tipi
+        name:
+          type: string
+          description: Kullanıcı adı
+        email:
+          type: string
+          format: email
+          description: E-posta adresi
+        phone_number:
+          type: string
+          description: Telefon numarası
+        profile_picture_url:
+          type: string
+          format: uri
+          description: Profil resmi URL'i
+        is_verified:
+          type: boolean
+          description: Hesap doğrulandı mı?
+        is_active:
+          type: boolean
+          description: Hesap aktif mi?
+        created_at:
+          type: string
+          format: date-time
+          description: Oluşturulma tarihi
+        updated_at:
+          type: string
+          format: date-time
+          description: Güncellenme tarihi
+
+    Listing:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: İlan ID'si
+        title:
+          type: string
+          description: İlan başlığı
+        price:
+          type: number
+          description: Fiyat (TL)
+        property_type:
+          type: string
+          enum: [daire, villa, dükkan, ofis, arsa]
+          description: Mülk tipi
+        city:
+          type: string
+          description: Şehir
+        district:
+          type: string
+          description: İlçe
+        sq_meters:
+          type: number
+          description: Metrekare
+        room_count:
+          type: string
+          description: Oda sayısı
+        status:
+          type: string
+          enum: [satılık, kiralık, satıldı, kiralandı]
+          description: İlan durumu
+        created_at:
+          type: string
+          format: date-time
+          description: Oluşturulma tarihi
+
+    ListingDetail:
+      allOf:
+        - $ref: '#/components/schemas/Listing'
+        - type: object
+          properties:
+            description:
+              type: string
+              description: Detaylı açıklama
+            images:
+              type: array
+              items:
+                type: string
+                format: uri
+              description: Resim URL'leri
+            features:
+              type: array
+              items:
+                type: string
+              description: Özellikler
+            owner:
+              $ref: '#/components/schemas/User'
+            coordinates:
+              type: object
+              properties:
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+
+    CreateListingRequest:
+      type: object
+      required:
+        - title
+        - price
+        - property_type
+        - city
+        - district
+        - sq_meters
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 200
+        description:
+          type: string
+        price:
+          type: number
+          minimum: 0
+        property_type:
+          type: string
+          enum: [daire, villa, dükkan, ofis, arsa]
+        city:
+          type: string
+        district:
+          type: string
+        sq_meters:
+          type: number
+          minimum: 1
+        room_count:
+          type: string
+        building_age:
+          type: integer
+          minimum: 0
+        floor:
+          type: integer
+          minimum: 0
+        total_floors:
+          type: integer
+          minimum: 1
+        heating_type:
+          type: string
+        has_parking:
+          type: boolean
+        has_balcony:
+          type: boolean
+        is_furnished:
+          type: boolean
+
+    UpdateListingRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 10
+          maxLength: 200
+        description:
+          type: string
+        price:
+          type: number
+          minimum: 0
+        status:
+          type: string
+          enum: [satılık, kiralık, satıldı, kiralandı]
+
+    ValuationRequest:
+      type: object
+      required:
+        - property_type
+        - features
+        - location
+      properties:
+        property_type:
+          type: string
+          enum: [daire, villa, dükkan, ofis, arsa]
+        features:
+          type: object
+          required:
+            - sq_meters
+            - room_count
+            - building_age
+          properties:
+            sq_meters:
+              type: number
+              minimum: 1
+            room_count:
+              type: integer
+              minimum: 1
+            building_age:
+              type: integer
+              minimum: 0
+            floor:
+              type: integer
+            total_floors:
+              type: integer
+            heating_type:
+              type: string
+            has_parking:
+              type: boolean
+            has_balcony:
+              type: boolean
+            is_furnished:
+              type: boolean
+        location:
+          type: object
+          required:
+            - city
+            - district
+          properties:
+            city:
+              type: string
+            district:
+              type: string
+            latitude:
+              type: number
+            longitude:
+              type: number
+        current_market_price:
+          type: number
+          minimum: 0
+
+    ValuationResponse:
+      type: object
+      properties:
+        estimated_price:
+          type: number
+          description: Tahmini fiyat (TL)
+        confidence_score:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Güven skoru
+        price_range:
+          type: object
+          properties:
+            min:
+              type: number
+            max:
+              type: number
+        factors:
+          type: object
+          description: Değerleme faktörleri
+        timestamp:
+          type: string
+          format: date-time
+        model_version:
+          type: string
+
+    CreateRentContractRequest:
+      type: object
+      required:
+        - property_id
+        - tenant_id
+        - start_date
+        - end_date
+        - monthly_rent
+        - deposit
+      properties:
+        property_id:
+          type: string
+          format: uuid
+        tenant_id:
+          type: string
+          format: uuid
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        monthly_rent:
+          type: number
+          minimum: 0
+        deposit:
+          type: number
+          minimum: 0
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        limit:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+        pages:
+          type: integer
+          minimum: 1
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Hata mesajı
+        details:
+          type: string
+          description: Detaylı hata açıklaması
+        code:
+          type: string
+          description: Hata kodu
