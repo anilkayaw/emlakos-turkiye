@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -28,10 +26,10 @@ type Claims struct {
 
 // Service URLs
 var (
-	AuthServiceURL    = "http://localhost:8082"
-	UserServiceURL    = "http://localhost:8083"
-	ListingServiceURL = "http://localhost:8084"
-	MessageServiceURL = "http://localhost:8085"
+	AuthServiceURL    = "http://localhost:8081"
+	UserServiceURL    = "http://localhost:8082"
+	ListingServiceURL = "http://localhost:8083"
+	MessageServiceURL = "http://localhost:8084"
 )
 
 func main() {
@@ -49,12 +47,12 @@ func main() {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		
+
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
-		
+
 		c.Next()
 	})
 
@@ -137,7 +135,7 @@ func main() {
 	}
 
 	log.Printf("🌐 EmlakOS Türkiye API Gateway başlatılıyor... Port: %s", port)
-	
+
 	if err := router.Run(":" + port); err != nil {
 		log.Fatal("API Gateway başlatılamadı:", err)
 	}

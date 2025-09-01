@@ -24,9 +24,9 @@ type PropertyListing struct {
 	TransactionType string  `json:"transaction_type"`
 	PropertyType    string  `json:"property_type"`
 	Location        struct {
-		City        string    `json:"city"`
-		District    string    `json:"district"`
-		Address     string    `json:"address"`
+		City        string     `json:"city"`
+		District    string     `json:"district"`
+		Address     string     `json:"address"`
 		Coordinates [2]float64 `json:"coordinates"`
 	} `json:"location"`
 	Details struct {
@@ -38,14 +38,14 @@ type PropertyListing struct {
 		Floor       int     `json:"floor"`
 		BuildingAge int     `json:"building_age"`
 	} `json:"details"`
-	Features []string `json:"features"`
+	Features  []string `json:"features"`
 	Amenities []string `json:"amenities"`
-	Images   []string `json:"images"`
-	Owner    struct {
-		ID       string `json:"id"`
-		Name     string `json:"name"`
-		Phone    string `json:"phone"`
-		Email    string `json:"email"`
+	Images    []string `json:"images"`
+	Owner     struct {
+		ID        string `json:"id"`
+		Name      string `json:"name"`
+		Phone     string `json:"phone"`
+		Email     string `json:"email"`
 		AvatarURL string `json:"avatar_url"`
 	} `json:"owner"`
 	Status         string `json:"status"`
@@ -71,12 +71,12 @@ func main() {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		
+
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
-		
+
 		c.Next()
 	})
 
@@ -107,11 +107,11 @@ func main() {
 	// Port
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8084"
+		port = "8083"
 	}
 
 	log.Printf("🏠 EmlakOS Türkiye Listing Service başlatılıyor... Port: %s", port)
-	
+
 	if err := router.Run(":" + port); err != nil {
 		log.Fatal("Listing Service başlatılamadı:", err)
 	}
@@ -124,22 +124,22 @@ func initDB() {
 	if dbHost == "" {
 		dbHost = "localhost"
 	}
-	
+
 	dbPort := os.Getenv("DB_PORT")
 	if dbPort == "" {
 		dbPort = "5432"
 	}
-	
+
 	dbUser := os.Getenv("DB_USER")
 	if dbUser == "" {
 		dbUser = "emlakos_admin"
 	}
-	
+
 	dbPassword := os.Getenv("DB_PASSWORD")
 	if dbPassword == "" {
 		dbPassword = "EmlakOS2024!SecureDB"
 	}
-	
+
 	dbName := os.Getenv("DB_NAME")
 	if dbName == "" {
 		dbName = "emlakos_turkiye"
@@ -164,22 +164,22 @@ func initDB() {
 func getMockListings() []PropertyListing {
 	return []PropertyListing{
 		{
-			ID:          "listing-1",
-			Title:       "Merkezi Konumda 3+1 Daire",
-			Description: "Şehrin merkezinde, ulaşım imkanlarına yakın, modern 3+1 daire.",
-			Price:       2500000,
-			Currency:    "TRY",
+			ID:              "listing-1",
+			Title:           "Merkezi Konumda 3+1 Daire",
+			Description:     "Şehrin merkezinde, ulaşım imkanlarına yakın, modern 3+1 daire.",
+			Price:           2500000,
+			Currency:        "TRY",
 			TransactionType: "sale",
-			PropertyType: "apartment",
+			PropertyType:    "apartment",
 			Location: struct {
-				City        string    `json:"city"`
-				District    string    `json:"district"`
-				Address     string    `json:"address"`
+				City        string     `json:"city"`
+				District    string     `json:"district"`
+				Address     string     `json:"address"`
 				Coordinates [2]float64 `json:"coordinates"`
 			}{
-				City:     "İstanbul",
-				District: "Beşiktaş",
-				Address:  "Etiler Mahallesi, No: 123",
+				City:        "İstanbul",
+				District:    "Beşiktaş",
+				Address:     "Etiler Mahallesi, No: 123",
 				Coordinates: [2]float64{41.0766, 29.0227},
 			},
 			Details: struct {
@@ -191,22 +191,22 @@ func getMockListings() []PropertyListing {
 				Floor       int     `json:"floor"`
 				BuildingAge int     `json:"building_age"`
 			}{
-				TotalArea:  120,
-				LivingArea: 100,
-				Rooms:      4,
-				Bedrooms:   3,
-				Bathrooms:  2,
-				Floor:      5,
+				TotalArea:   120,
+				LivingArea:  100,
+				Rooms:       4,
+				Bedrooms:    3,
+				Bathrooms:   2,
+				Floor:       5,
 				BuildingAge: 10,
 			},
 			Features:  []string{"Balkon", "Asansör", "Güvenlik", "Otopark"},
 			Amenities: []string{"Market", "Okul", "Hastane", "Metro"},
 			Images:    []string{"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800"},
 			Owner: struct {
-				ID       string `json:"id"`
-				Name     string `json:"name"`
-				Phone    string `json:"phone"`
-				Email    string `json:"email"`
+				ID        string `json:"id"`
+				Name      string `json:"name"`
+				Phone     string `json:"phone"`
+				Email     string `json:"email"`
 				AvatarURL string `json:"avatar_url"`
 			}{
 				ID:        "user-1",
@@ -226,22 +226,22 @@ func getMockListings() []PropertyListing {
 			PublishedAt:    "2025-09-01T20:00:00Z",
 		},
 		{
-			ID:          "listing-2",
-			Title:       "Deniz Manzaralı Villa",
-			Description: "Bodrum'da deniz manzaralı, havuzlu, lüks villa.",
-			Price:       8500000,
-			Currency:    "TRY",
+			ID:              "listing-2",
+			Title:           "Deniz Manzaralı Villa",
+			Description:     "Bodrum'da deniz manzaralı, havuzlu, lüks villa.",
+			Price:           8500000,
+			Currency:        "TRY",
 			TransactionType: "sale",
-			PropertyType: "villa",
+			PropertyType:    "villa",
 			Location: struct {
-				City        string    `json:"city"`
-				District    string    `json:"district"`
-				Address     string    `json:"address"`
+				City        string     `json:"city"`
+				District    string     `json:"district"`
+				Address     string     `json:"address"`
 				Coordinates [2]float64 `json:"coordinates"`
 			}{
-				City:     "Muğla",
-				District: "Bodrum",
-				Address:  "Yalıkavak Mahallesi, No: 456",
+				City:        "Muğla",
+				District:    "Bodrum",
+				Address:     "Yalıkavak Mahallesi, No: 456",
 				Coordinates: [2]float64{37.1028, 27.2582},
 			},
 			Details: struct {
@@ -253,22 +253,22 @@ func getMockListings() []PropertyListing {
 				Floor       int     `json:"floor"`
 				BuildingAge int     `json:"building_age"`
 			}{
-				TotalArea:  350,
-				LivingArea: 280,
-				Rooms:      6,
-				Bedrooms:   4,
-				Bathrooms:  3,
-				Floor:      2,
+				TotalArea:   350,
+				LivingArea:  280,
+				Rooms:       6,
+				Bedrooms:    4,
+				Bathrooms:   3,
+				Floor:       2,
 				BuildingAge: 5,
 			},
 			Features:  []string{"Havuz", "Bahçe", "Güvenlik", "Deniz Manzarası"},
 			Amenities: []string{"Plaj", "Marina", "Restoran", "Alışveriş"},
 			Images:    []string{"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800"},
 			Owner: struct {
-				ID       string `json:"id"`
-				Name     string `json:"name"`
-				Phone    string `json:"phone"`
-				Email    string `json:"email"`
+				ID        string `json:"id"`
+				Name      string `json:"name"`
+				Phone     string `json:"phone"`
+				Email     string `json:"email"`
 				AvatarURL string `json:"avatar_url"`
 			}{
 				ID:        "user-2",
@@ -307,7 +307,7 @@ func handleGetListings(c *gin.Context) {
 
 	// Mock filtering (in real app, this would be database query)
 	listings := getMockListings()
-	
+
 	// Apply filters
 	filteredListings := []PropertyListing{}
 	for _, listing := range listings {
@@ -351,9 +351,9 @@ func handleGetListings(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"listings": filteredListings,
 		"pagination": gin.H{
-			"page":       pageInt,
-			"limit":      limitInt,
-			"total":      len(getMockListings()),
+			"page":        pageInt,
+			"limit":       limitInt,
+			"total":       len(getMockListings()),
 			"total_pages": (len(getMockListings()) + limitInt - 1) / limitInt,
 		},
 	})
@@ -361,7 +361,7 @@ func handleGetListings(c *gin.Context) {
 
 func handleGetListing(c *gin.Context) {
 	id := c.Param("id")
-	
+
 	// Find listing by ID
 	listings := getMockListings()
 	for _, listing := range listings {
@@ -402,7 +402,7 @@ func handleCreateListing(c *gin.Context) {
 
 func handleUpdateListing(c *gin.Context) {
 	id := c.Param("id")
-	
+
 	var updateData map[string]interface{}
 	if err := c.ShouldBindJSON(&updateData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Geçersiz veri formatı"})
@@ -410,7 +410,7 @@ func handleUpdateListing(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "İlan başarıyla güncellendi",
+		"message":    "İlan başarıyla güncellendi",
 		"listing_id": id,
 	})
 }
@@ -419,7 +419,7 @@ func handleDeleteListing(c *gin.Context) {
 	id := c.Param("id")
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "İlan başarıyla silindi",
+		"message":    "İlan başarıyla silindi",
 		"listing_id": id,
 	})
 }
@@ -428,40 +428,40 @@ func handleToggleFavorite(c *gin.Context) {
 	id := c.Param("id")
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Favori durumu güncellendi",
-		"listing_id": id,
+		"message":     "Favori durumu güncellendi",
+		"listing_id":  id,
 		"is_favorite": true,
 	})
 }
 
 func handleSearchListings(c *gin.Context) {
 	query := c.Query("q")
-	
+
 	// Mock search
 	listings := getMockListings()
 	results := []PropertyListing{}
-	
+
 	for _, listing := range listings {
-		if query == "" || 
-		   contains(listing.Title, query) || 
-		   contains(listing.Description, query) ||
-		   contains(listing.Location.City, query) ||
-		   contains(listing.Location.District, query) {
+		if query == "" ||
+			contains(listing.Title, query) ||
+			contains(listing.Description, query) ||
+			contains(listing.Location.City, query) ||
+			contains(listing.Location.District, query) {
 			results = append(results, listing)
 		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"listings": results,
-		"query": query,
-		"total": len(results),
+		"query":    query,
+		"total":    len(results),
 	})
 }
 
 func handleGetMapProperties(c *gin.Context) {
 	// Mock map properties
 	listings := getMockListings()
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"properties": listings,
 	})
@@ -474,7 +474,7 @@ func handleGetNearbyProperties(c *gin.Context) {
 
 	// Mock nearby search
 	listings := getMockListings()
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"properties": listings,
 		"center": gin.H{

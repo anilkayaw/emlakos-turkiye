@@ -10,7 +10,7 @@ const nextConfig = {
   // Asset prefix
   assetPrefix: process.env.NODE_ENV === 'production' ? '/emlakos-turkiye' : '',
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1',
     NEXT_PUBLIC_MAPBOX_TOKEN: process.env.NEXT_PUBLIC_MAPBOX_TOKEN || 'pk.test',
   },
 }

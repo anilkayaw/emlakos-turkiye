@@ -15,15 +15,15 @@ var db *sql.DB
 
 // User struct
 type User struct {
-	ID        string `json:"id"`
-	Email     string `json:"email"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Phone     string `json:"phone"`
-	UserType  string `json:"user_type"`
-	IsVerified bool  `json:"is_verified"`
-	IsActive  bool   `json:"is_active"`
-	CreatedAt string `json:"created_at"`
+	ID         string `json:"id"`
+	Email      string `json:"email"`
+	FirstName  string `json:"first_name"`
+	LastName   string `json:"last_name"`
+	Phone      string `json:"phone"`
+	UserType   string `json:"user_type"`
+	IsVerified bool   `json:"is_verified"`
+	IsActive   bool   `json:"is_active"`
+	CreatedAt  string `json:"created_at"`
 }
 
 func main() {
@@ -38,12 +38,12 @@ func main() {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		
+
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
-		
+
 		c.Next()
 	})
 
@@ -70,11 +70,11 @@ func main() {
 	// Port
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8083"
+		port = "8082"
 	}
 
 	log.Printf("👤 EmlakOS Türkiye User Service başlatılıyor... Port: %s", port)
-	
+
 	if err := router.Run(":" + port); err != nil {
 		log.Fatal("User Service başlatılamadı:", err)
 	}
@@ -87,22 +87,22 @@ func initDB() {
 	if dbHost == "" {
 		dbHost = "localhost"
 	}
-	
+
 	dbPort := os.Getenv("DB_PORT")
 	if dbPort == "" {
 		dbPort = "5432"
 	}
-	
+
 	dbUser := os.Getenv("DB_USER")
 	if dbUser == "" {
 		dbUser = "emlakos_admin"
 	}
-	
+
 	dbPassword := os.Getenv("DB_PASSWORD")
 	if dbPassword == "" {
 		dbPassword = "EmlakOS2024!SecureDB"
 	}
-	
+
 	dbName := os.Getenv("DB_NAME")
 	if dbName == "" {
 		dbName = "emlakos_turkiye"
@@ -185,11 +185,11 @@ func handleGetDashboard(c *gin.Context) {
 	// Mock dashboard data
 	dashboard := gin.H{
 		"stats": gin.H{
-			"total_listings":    15,
-			"active_listings":   12,
-			"total_views":       1250,
-			"total_contacts":    45,
-			"favorite_count":    8,
+			"total_listings":  15,
+			"active_listings": 12,
+			"total_views":     1250,
+			"total_contacts":  45,
+			"favorite_count":  8,
 		},
 		"recent_activity": []gin.H{
 			{
@@ -224,7 +224,7 @@ func handleGetViews(c *gin.Context) {
 				"views":      125,
 			},
 			{
-				"listing_id": "listing-2", 
+				"listing_id": "listing-2",
 				"title":      "Deniz Manzaralı Villa",
 				"views":      98,
 			},
