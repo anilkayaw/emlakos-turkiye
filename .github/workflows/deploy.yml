@@ -20,14 +20,12 @@ jobs:
         node-version: '18'
         
     - name: Install dependencies
-      run: |
-        cd frontend/web-app
-        npm ci
+      working-directory: frontend/web-app
+      run: npm ci
         
     - name: Build
-      run: |
-        cd frontend/web-app
-        NODE_ENV=production npm run build
+      working-directory: frontend/web-app
+      run: NODE_ENV=production npm run build
         
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
