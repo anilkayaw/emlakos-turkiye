@@ -61,18 +61,18 @@ export default function IlanEklePage() {
     { id: 5, title: 'Özet', icon: CheckCircle }
   ]
 
-  const handleInputChange = <K extends keyof PropertyFormData>(field: K, value: PropertyFormData[K]) => {
-    setFormData(prev => ({
-      ...prev,
+  const handleInputChange = (field: string, value: any) => {
+    setFormData({
+      ...formData,
       [field]: value
-    }))
+    })
     
     // Kullanıcı yazmaya başladığında hatayı temizle
     if (Object.prototype.hasOwnProperty.call(errors, field)) {
-      setErrors(prev => ({
-        ...prev,
+      setErrors({
+        ...errors,
         [field]: ''
-      }))
+      })
     }
   }
 

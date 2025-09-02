@@ -270,10 +270,10 @@ export default function UserDashboard() {
               <CardContent className="p-0">
                 <nav className="space-y-1">
                   {[
-                    { id: 'overview', label: 'Genel Bakış', icon: BarChart3 },
+                    { id: 'overview', label: 'Genel Bakış', icon: TrendingUp },
                     { id: 'listings', label: 'İlanlarım', icon: Home },
                     { id: 'favorites', label: 'Favorilerim', icon: Heart },
-                    { id: 'messages', label: 'Mesajlarım', icon: MessageCircle },
+                    { id: 'messages', label: 'Mesajlarım', icon: MessageSquare },
                     { id: 'profile', label: 'Profil', icon: User }
                   ].map((item) => (
                     <button

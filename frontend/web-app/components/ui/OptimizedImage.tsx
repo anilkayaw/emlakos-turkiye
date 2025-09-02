@@ -253,3 +253,20 @@ export const HeroImage: React.FC<{
     </div>
   )
 }
+
+// Property-specific image components
+export const PropertyImage: React.FC<OptimizedImageProps> = (props) => (
+  <OptimizedImage
+    {...props}
+    className={`rounded-lg ${props.className || ''}`}
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  />
+)
+
+export const GalleryImage: React.FC<OptimizedImageProps> = (props) => (
+  <OptimizedImage
+    {...props}
+    className={`rounded-md ${props.className || ''}`}
+    sizes="(max-width: 768px) 50vw, 25vw"
+  />
+)

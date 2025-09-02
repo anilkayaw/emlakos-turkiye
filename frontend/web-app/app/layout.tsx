@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { ApolloProvider } from '@apollo/client/react'
-import { apolloClient } from '@/lib/graphql'
+import { ClientApolloProvider } from '@/components/providers/ApolloProvider'
+import { SessionProvider } from '@/components/providers/SessionProvider'
+import { Header } from '@/components/layout/Header'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -74,13 +75,18 @@ export default function RootLayout({
         <meta name="theme-color" content="#3b82f6" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </head>
-      <body className={`${inter.className} antialiased bg-secondary-50 text-secondary-900`}>
-        <ApolloProvider client={apolloClient}>
-          <div id="root">
-            {children}
-          </div>
-        </ApolloProvider>
-      </body>
+                        <body className={`${inter.className} antialiased bg-secondary-50 text-secondary-900`}>
+                    <SessionProvider>
+                      <ClientApolloProvider>
+                        <div id="root">
+                          <Header />
+                          <main>
+                            {children}
+                          </main>
+                        </div>
+                      </ClientApolloProvider>
+                    </SessionProvider>
+                  </body>
     </html>
   )
 }

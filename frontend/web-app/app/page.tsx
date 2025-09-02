@@ -1,3 +1,5 @@
+'use client'
+
 import React, { Suspense } from 'react'
 import { motion } from 'framer-motion'
 import { 
@@ -16,7 +18,9 @@ import Link from 'next/link'
 import { PropertyCard } from '@/components/property/PropertyCard'
 import { apiClient } from '@/lib/api'
 import { Property } from '@/types/api'
-import { MapView, SearchForm, Header } from '@/lib/dynamic-imports'
+import { Header } from '@/components/layout/Header'
+import { MapView, SearchForm } from '@/lib/dynamic-imports'
+import { HeroBanner } from '@/components/layout/Banner'
 
 // SSR Data fetching function
 async function getRecentListings(): Promise<Property[]> {
@@ -178,7 +182,6 @@ const popularSearches = [
 ]
 
 // Client component for interactive features
-'use client'
 import { useState, useEffect } from 'react'
 
 function HomePageClient({ recentListings }: { recentListings: Property[] }) {

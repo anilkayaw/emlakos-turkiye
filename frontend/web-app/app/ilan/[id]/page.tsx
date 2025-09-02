@@ -88,6 +88,12 @@ interface Property {
   views: number
 }
 
+// Generate static params for dynamic routes
+export async function generateStaticParams() {
+  // Return empty array for now - in production, fetch from API
+  return []
+}
+
 export default function PropertyDetailPage() {
   const params = useParams()
   const [property, setProperty] = useState<Property | null>(null)
