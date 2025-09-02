@@ -27,18 +27,18 @@ var jwtSecret []byte
 
 // User struct
 type User struct {
-	ID                string    `json:"id"`
-	Email             string    `json:"email"`
-	FirstName         string    `json:"first_name"`
-	LastName          string    `json:"last_name"`
-	Phone             string    `json:"phone"`
-	UserType          string    `json:"user_type"`
-	IsVerified        bool      `json:"is_verified"`
-	IsActive          bool      `json:"is_active"`
-	CreatedAt         time.Time `json:"created_at"`
-	LastLoginAt       *time.Time `json:"last_login_at"`
-	FailedLoginAttempts int     `json:"failed_login_attempts"`
-	LockedUntil       *time.Time `json:"locked_until"`
+	ID                  string     `json:"id"`
+	Email               string     `json:"email"`
+	FirstName           string     `json:"first_name"`
+	LastName            string     `json:"last_name"`
+	Phone               string     `json:"phone"`
+	UserType            string     `json:"user_type"`
+	IsVerified          bool       `json:"is_verified"`
+	IsActive            bool       `json:"is_active"`
+	CreatedAt           time.Time  `json:"created_at"`
+	LastLoginAt         *time.Time `json:"last_login_at"`
+	FailedLoginAttempts int        `json:"failed_login_attempts"`
+	LockedUntil         *time.Time `json:"locked_until"`
 }
 
 // JWT Claims
@@ -100,12 +100,12 @@ func main() {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		
+
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
-		
+
 		c.Next()
 	})
 
@@ -128,11 +128,11 @@ func main() {
 	// Port
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8082"
+		port = "8081"
 	}
 
 	log.Printf("🔐 EmlakOS Türkiye Auth Service başlatılıyor... Port: %s", port)
-	
+
 	if err := router.Run(":" + port); err != nil {
 		log.Fatal("Auth Service başlatılamadı:", err)
 	}
@@ -145,22 +145,22 @@ func initDB() {
 	if dbHost == "" {
 		dbHost = "localhost"
 	}
-	
+
 	dbPort := os.Getenv("DB_PORT")
 	if dbPort == "" {
 		dbPort = "5432"
 	}
-	
+
 	dbUser := os.Getenv("DB_USER")
 	if dbUser == "" {
-		dbUser = "emlakos_admin"
+		dbUser = "emlakos_user"
 	}
-	
+
 	dbPassword := os.Getenv("DB_PASSWORD")
 	if dbPassword == "" {
-		dbPassword = "EmlakOS2024!SecureDB"
+		dbPassword = "emlakos_password_2024"
 	}
-	
+
 	dbName := os.Getenv("DB_NAME")
 	if dbName == "" {
 		dbName = "emlakos_turkiye"
@@ -444,7 +444,7 @@ func handleLogin(c *gin.Context) {
 		// Başarısız giriş sayısını artır
 		failedAttempts := user.FailedLoginAttempts + 1
 		var lockedUntil *time.Time
-		
+
 		if failedAttempts >= 5 {
 			lockTime := time.Now().Add(30 * time.Minute)
 			lockedUntil = &lockTime
@@ -487,11 +487,11 @@ func handleLogin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Giriş başarılı",
 		"user": gin.H{
-			"id":         user.ID,
-			"email":      user.Email,
-			"first_name": user.FirstName,
-			"last_name":  user.LastName,
-			"user_type":  user.UserType,
+			"id":          user.ID,
+			"email":       user.Email,
+			"first_name":  user.FirstName,
+			"last_name":   user.LastName,
+			"user_type":   user.UserType,
 			"is_verified": user.IsVerified,
 		},
 		"tokens": gin.H{
@@ -504,7 +504,7 @@ func handleLogin(c *gin.Context) {
 
 func handleLogout(c *gin.Context) {
 	userID := c.GetString("user_id")
-	
+
 	// Session'ı deaktive et
 	_, err := db.Exec(`
 		UPDATE emlakos.user_sessions 
@@ -521,7 +521,7 @@ func handleLogout(c *gin.Context) {
 
 func handleGetProfile(c *gin.Context) {
 	userID := c.GetString("user_id")
-	
+
 	var user User
 	err := db.QueryRow(`
 		SELECT id, email, first_name, last_name, phone, user_type, 
@@ -544,7 +544,7 @@ func handleGetProfile(c *gin.Context) {
 
 func handleUpdateProfile(c *gin.Context) {
 	userID := c.GetString("user_id")
-	
+
 	var req struct {
 		FirstName string `json:"first_name"`
 		LastName  string `json:"last_name"`

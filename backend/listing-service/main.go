@@ -132,12 +132,12 @@ func initDB() {
 
 	dbUser := os.Getenv("DB_USER")
 	if dbUser == "" {
-		dbUser = "emlakos_admin"
+		dbUser = "emlakos_user"
 	}
 
 	dbPassword := os.Getenv("DB_PASSWORD")
 	if dbPassword == "" {
-		dbPassword = "EmlakOS2024!SecureDB"
+		dbPassword = "emlakos_password_2024"
 	}
 
 	dbName := os.Getenv("DB_NAME")

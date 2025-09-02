@@ -43,10 +43,10 @@ type Conversation struct {
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	} `json:"seller"`
-	LastMessage  *Message `json:"last_message"`
-	UnreadCount  int      `json:"unread_count"`
-	CreatedAt    string   `json:"created_at"`
-	UpdatedAt    string   `json:"updated_at"`
+	LastMessage *Message `json:"last_message"`
+	UnreadCount int      `json:"unread_count"`
+	CreatedAt   string   `json:"created_at"`
+	UpdatedAt   string   `json:"updated_at"`
 }
 
 func main() {
@@ -61,12 +61,12 @@ func main() {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		
+
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
-		
+
 		c.Next()
 	})
 
@@ -91,11 +91,11 @@ func main() {
 	// Port
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8085"
+		port = "8084"
 	}
 
 	log.Printf("💬 EmlakOS Türkiye Message Service başlatılıyor... Port: %s", port)
-	
+
 	if err := router.Run(":" + port); err != nil {
 		log.Fatal("Message Service başlatılamadı:", err)
 	}
@@ -108,22 +108,22 @@ func initDB() {
 	if dbHost == "" {
 		dbHost = "localhost"
 	}
-	
+
 	dbPort := os.Getenv("DB_PORT")
 	if dbPort == "" {
 		dbPort = "5432"
 	}
-	
+
 	dbUser := os.Getenv("DB_USER")
 	if dbUser == "" {
-		dbUser = "emlakos_admin"
+		dbUser = "emlakos_user"
 	}
-	
+
 	dbPassword := os.Getenv("DB_PASSWORD")
 	if dbPassword == "" {
-		dbPassword = "EmlakOS2024!SecureDB"
+		dbPassword = "emlakos_password_2024"
 	}
-	
+
 	dbName := os.Getenv("DB_NAME")
 	if dbName == "" {
 		dbName = "emlakos_turkiye"
@@ -286,7 +286,7 @@ func getMockMessages(conversationID string) []Message {
 // Handler functions
 func handleGetConversations(c *gin.Context) {
 	conversations := getMockConversations()
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"conversations": conversations,
 	})
@@ -300,9 +300,9 @@ func handleGetMessages(c *gin.Context) {
 	}
 
 	messages := getMockMessages(conversationID)
-	
+
 	c.JSON(http.StatusOK, gin.H{
-		"messages": messages,
+		"messages":        messages,
 		"conversation_id": conversationID,
 	})
 }
